@@ -2,6 +2,15 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Indicator
+
+type 0: singlechoice
+type 1: checkbox
+type 2: textfree
+
+
+
+
 ## Available Scripts
 
 In the project directory, you can run:
