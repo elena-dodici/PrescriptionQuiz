@@ -1,6 +1,9 @@
 import {QUESTION} from '../shared/questions';
-import{Button,Form,FormGroup,Label,Input,Col,FormFeedback} from 'reactstrap';
+
 import React from 'react';
+import CheckBoxQ from './CheckBoxComponent'
+import FreetextQ from './FreeTextComponent'
+import SingleQ from './SingleQuestionComponent'
 
 class Question extends React.Component{
 
@@ -16,7 +19,6 @@ class Question extends React.Component{
      currentQ : this.props.Ques[1],
      ansIndex:[],
      ansDict:{},
-
      checkedboxans:{},
      freetext:'',
      touched:{
@@ -25,7 +27,6 @@ class Question extends React.Component{
      }
 
     }
-
     this.handleCheckedboxChange = this.handleCheckedboxChange.bind(this);
     this.handleCheckedboxSubmit = this.handleCheckedboxSubmit.bind(this);
     this.handleFreetextChange = this.handleFreetextChange.bind(this);
@@ -52,59 +53,59 @@ class Question extends React.Component{
 
 
 
-jumpNext(ans,question){
+jumpNext(ans, question){
+
+    console.log(currentQ)
+     console.log(question)
+     console.log(ans)
+
+
     setTimeout(()=>{
-
-    this.setState({currentQ:QUESTION[QUESTION[this.state.currentQ.id].answer[ans]]})
-    this.setState({ansIndex:[...this.state.ansIndex,question.id]}
-      //{ansIndex:ansIndex.add(question.id)}
-    )
+      this.setState({
+        currentQ:QUESTION[question.answer[ans]]
+      })
     this.setState({
-     ansDict:{...this.state.ansDict,[question.id]:ans}}
-    )
+      ansIndex:[...this.ansIndex,question.id]
+    })
+    this.setState({
+     ansDict:{...this.ansDict,[question.id]:ans}})
 
-    },300);
+   },300);
     }
 
 
-  singleChoiceQ(question){
-     // for(const [key,value] of Object.entries(question.answer))
-     //      console.log(`${key}`)
-    // console.log(Object.keys(question.answer))
-
-   let lastAns = "";
-   if (this.state.ansDict.length!==0 && question.id in this.state.ansDict){
-
-        lastAns = this.state.ansDict[question.id];
-     }
-   const answers = Object.keys(question.answer).map((ans)=> {
-     if(lastAns === ans)
-         return(
-           <div key={question.id+ans}>
-               <input type="radio"  onClick={()=>this.jumpNext(ans,question)} name={question.id} value ={ans} defaultChecked={true}/>{ans}
-           </div>
-         );
-     else
-        return(
-          <div key={question.id+ans}>
-
-              <input type="radio" onClick={()=>this.jumpNext(ans,question)} name={question.id} value ={ans}/>{ans}
-          </div>
-        );
-    });
 
 
-    return(
-        <div className="container">
-          <div className="row">
-                <p>{question.name}</p>
-                   {answers}
-          </div>
-        </div>
+
+handleCheckedboxSubmit(event){
+  this.setState({currentQ:QUESTION[(this.props.id+1)]})
+  this.setState(
+    {ansIndex:[...this.state.ansIndex,this.props.id]}
+  )
+  this.setState({
+   ansDict:{...this.state.ansDict,[this.props.id]:this.state.checkedboxans}}
     )
+  this.setState({checkedboxans:{}})
+  event.preventDefault();
+  }
 
-}
 
+
+  //console.log('allergy antibiotic'+JSON.stringify(this.state.ansDict));
+
+
+handleCheckedboxChange(event){
+
+  const target = event.target;
+  const newvalue = target.type === 'checkbox' ? target.checked : target.value;
+  const newname =target.name;
+
+  //checkedboxans:{...prevState.checkedboxans},newname:"update"}
+  this.setState(prevState =>({
+    checkedboxans:{...this.state.checkedboxans,[newname]:newvalue}
+  }
+   //checkedboxans:{...prevState.checkedboxans,[newname]:newvalue}}
+  ))}
 
 
 
@@ -153,160 +154,6 @@ validate(freetext){
 }
 
  //htmlfor 规定 label 与哪个表单元素绑定
-typeFreetext(question){
-
-  let lasAns = "";
-  if(this.state.ansDict.length!==0 && this.state.ansIndex.includes(question.id)){
-    lasAns = this.state.ansDict[question.id]
-  }
-  const errors = this.validate(this.state.freetext);
-    if(lasAns === this.state.freetext){
-      return(
-        <Form onSubmit={this.handleFreetextSubmit}>
-            <FormGroup row>
-                <Label htmlFor='freetext' md={2}>{this.state.currentQ.name}</Label>
-                <Col md={10}>
-                    <Input type='textarea' id='freetext' name='message'
-                        row="12"
-                        value ={this.state.ansDict[this.state.currentQ.id]}
-                        valid={errors.freetext===''}
-                        invalid={errors.freetext!==''}
-                        onBlur={this.handleBlur("freetext")}
-                        onChange={this.handleFreetextChange}
-                     ></Input>
-                     <FormFeedback>{errors.freetext} </FormFeedback>
-                </Col>
-            </FormGroup>
-
-            <FormGroup row>
-                <Col md={{size:10, offset:2}}>
-                   <Button type="submit" >
-                     Next
-                    </Button>
-                </Col>
-           </FormGroup>
-        </Form>
-      )
-    }
-
-    else{
-      return(
-        <Form onSubmit={this.handleFreetextSubmit}>
-            <FormGroup row>
-                <Label htmlFor='freetext' md={2}>{this.state.currentQ.name}</Label>
-                <Col md={10}>
-                    <Input type='textarea' id='freetext' name='message'
-                        row="12"
-                        value ={this.state.freetext}
-                        valid={errors.freetext===''}
-                        invalid={errors.freetext!==''}
-                        onBlur={this.handleBlur("freetext")}
-                        onChange={this.handleFreetextChange}
-                     ></Input>
-                     <FormFeedback>{errors.freetext} </FormFeedback>
-                </Col>
-            </FormGroup>
-
-            <FormGroup row>
-                <Col md={{size:10, offset:2}}>
-                   <Button type="submit" >
-                     Next
-                    </Button>
-                </Col>
-           </FormGroup>
-        </Form>
-      );
-    }
-
-}
-
-
-
-selectCheckBox(question){
-  const checkBox =Object.keys(question.answer).map((ans)=>{
-        if(Object.keys(this.state.checkedboxans).includes(ans) && this.state.checkedboxans[ans]===true)
-            return(
-              <div key={question.id+ans}>
-                         <Input type='checkbox'
-                          name ={ans}
-                          onChange={this.handleCheckedboxChange}
-                          checked
-                          />{' '}
-                         {ans}
-
-
-              </div>
-          )
-
-        else{
-          return (
-            <div key={question.id+ans}>
-                       <Input type='checkbox'
-                        name ={ans}
-                        onChange={this.handleCheckedboxChange}
-                        />{' '}
-                       {ans}
-
-
-            </div>
-          );
-       }
-    });
-
-    return(
-      <div className="row row-content">
-        <div className="col-12">
-          <Form onSubmit={this.handleCheckedboxSubmit}>
-              <FormGroup check>
-                  <Label check>
-                      <p>{question.name}</p>
-                     <strong>{checkBox}</strong>
-
-                  </Label>
-             </FormGroup>
-             <FormGroup row>
-                 <Col md={{size:10, offset:2}}>
-                    <Button type="submit" >
-                      Next
-                     </Button>
-                 </Col>
-            </FormGroup>
-       </Form>
-     </div>
-    </div>
-    )
-}
-
-handleCheckedboxSubmit(event){
-  this.setState({currentQ:QUESTION[(this.state.currentQ.id+1)]})
-  this.setState(
-    {ansIndex:[...this.state.ansIndex,this.state.currentQ.id]}
-  )
-  this.setState({
-   ansDict:{...this.state.ansDict,[this.state.currentQ.id]:this.state.checkedboxans}}
-    )
-  this.setState({checkedboxans:{}})
-  event.preventDefault();
-  }
-
-
-
-  //console.log('allergy antibiotic'+JSON.stringify(this.state.ansDict));
-
-
-handleCheckedboxChange(event){
-
-  const target = event.target;
-  const newvalue = target.type === 'checkbox' ? target.checked : target.value;
-  const newname =target.name;
-
-  //checkedboxans:{...prevState.checkedboxans},newname:"update"}
-  this.setState(prevState =>({
-    checkedboxans:{...this.state.checkedboxans,[newname]:newvalue}
-  }
-   //checkedboxans:{...prevState.checkedboxans,[newname]:newvalue}}
-  ))}
-
 
 
 endQ(question){
@@ -340,14 +187,21 @@ renderButton(){
 
 
 render(){
-  console.log(this.state.ansDict)
+
   //console.log(this.state.ansIndex)
-  console.log(this.state.checkedboxans)
+
     const Qtype = this.state.currentQ.type;
       if (Qtype===0){
         return (
           <div>
-            {this.singleChoiceQ(this.state.currentQ)}
+
+            <SingleQ   curquz={this.state.currentQ}
+                       ansIndex={this.state.ansIndex}
+                       ansDict={this.state.ansDict}
+                       checkedboxans={this.state.checkedboxans}
+                       onClick={this.jumpNext}/>
+
+
 
             {this.renderButton()}
           </div>
@@ -356,7 +210,10 @@ render(){
       else if(Qtype===1){
         return (
           <div>
-            {this.selectCheckBox(this.state.currentQ)}
+            <CheckBoxQ curquz={this.state.currentQ}
+                       ansIndex={this.state.ansIndex}
+                       ansDict={this.state.ansDict}
+                       checkedboxans={this.state.checkedboxans}/>
             {this.renderButton()}
           </div>
         );
@@ -365,6 +222,11 @@ render(){
         return (
           <div>
           {this.typeFreetext(this.state.currentQ)}
+          <FreetextQ curquz={this.state.currentQ}
+                     ansIndex={this.state.ansIndex}
+                     ansDict={this.state.ansDict}
+                     checkedboxans={this.state.checkedboxans}/>
+
           {this.renderButton()}
           </div>
         );

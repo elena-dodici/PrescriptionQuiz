@@ -1,6 +1,7 @@
 import {QUESTION} from '../shared/questions';
 import React,{Component} from 'react';
 import Question from './RenderQuestion';
+
 import { Navbar ,NavbarBrand} from 'reactstrap';
 
 
@@ -16,11 +17,6 @@ class Main extends React.Component{
     }
 
   }
-
-
-
-
-
 
 
 render(){
